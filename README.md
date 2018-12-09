@@ -3,14 +3,17 @@
 * Use Mysql as database
 * Use web sockets for communication between the frontend and backend part
 
-mysql with docker:
-docker-compose -f mysql.yml up
+###Start Project
+
+####start mysql with docker:
+docker-compose -f docker/mysql.yml up
 python3 manage.py makemigrations rooms
 python3 manage.py migrate
 
+#### start redis
+docker run -p 6379:6379 -d redis:2.8
 
-insert sample room from shell
-
+##### sample data insert with shell
 python3 manage.py shell
 from rooms.models import Room
 room = Room(name="first", count=1)

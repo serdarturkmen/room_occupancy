@@ -1,10 +1,43 @@
-
 # Create your views here.
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rooms.models import Room
 from rooms.serializers import RoomSerializer
+
+
+def enter_occupant(request):
+    if request.method == 'GET' and 'name' in request.GET:
+        room = Room.objects.get(pk=1)
+        room.count = room.count + 1
+        room.save()
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "occupancy", {"type": "user.occupancy",
+                       "event": "Enter Occupant",
+                       "count": room.count})
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=404)
+
+
+def exit_occupant(request):
+    if request.method == 'GET' and 'name' in request.GET:
+        room = Room.objects.get(pk=1)
+        room.count = room.count - 1
+        room.save()
+        name =  request.GET["name"]
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "occupancy", {"type": "user.occupancy",
+                       "event": "Exit Occupant",
+                       "count": room.count})
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=404)
 
 
 @csrf_exempt
@@ -24,6 +57,7 @@ def room_list(request):
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
+
 
 @csrf_exempt
 def room_detail(request, pk):
@@ -50,3 +84,4 @@ def room_detail(request, pk):
     elif request.method == 'DELETE':
         room.delete()
         return HttpResponse(status=204)
+

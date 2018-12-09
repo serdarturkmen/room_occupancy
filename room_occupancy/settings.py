@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rooms.apps.RoomsConfig'
+    'rooms.apps.RoomsConfig',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'room_occupancy.wsgi.application'
+
+ASGI_APPLICATION = "room_occupancy.routing.application"
 
 
 # Database
@@ -125,3 +128,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
