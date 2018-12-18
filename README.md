@@ -14,7 +14,7 @@ python3 manage.py migrate
 docker run -p 6379:6379 -d redis:2.8
 
 ##### sample data insert with shell
-python3 manage.py shell
-from rooms.models import Room
-room = Room(name="first", count=1)
-room.save()
+* python3 manage.py shell
+* from rooms.models import Room
+* room = Room(name="first", count=1)
+* room.save()
