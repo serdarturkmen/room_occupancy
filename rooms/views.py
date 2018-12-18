@@ -10,9 +10,7 @@ from rooms.serializers import RoomSerializer
 
 def enter_occupant(request):
     if request.method == 'GET' and 'name' in request.GET:
-        room = Room.objects.get(pk=1)
-        room.count = room.count + 1
-        room.save()
+        room = increaseOcuppant()
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "occupancy", {"type": "user.occupancy",
@@ -26,10 +24,8 @@ def enter_occupant(request):
 
 def exit_occupant(request):
     if request.method == 'GET' and 'name' in request.GET:
-        room = Room.objects.get(pk=1)
-        room.count = room.count - 1
-        room.save()
-        name =  request.GET["name"]
+        room = decreaseOccuppant()
+        name = request.GET["name"]
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "occupancy", {"type": "user.occupancy",
@@ -38,6 +34,20 @@ def exit_occupant(request):
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=404)
+
+
+def increaseOcuppant():
+    room = Room.objects.get(pk=1)
+    room.count = room.count + 1
+    room.save()
+    return room
+
+
+def decreaseOccuppant():
+    room = Room.objects.get(pk=1)
+    room.count = room.count - 1
+    room.save()
+    return room
 
 
 @csrf_exempt
